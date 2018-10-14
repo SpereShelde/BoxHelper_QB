@@ -1,28 +1,20 @@
 # BoxHelper
-# 这是 Pro 分支，只支持qBittorrent客户端; This is pro branch, which only support qBittorrent
+## 此版本只支持qBittorrent客户端; This version only supports qBittorrent
 ## 使用; How to use
 
-克隆仓库; Clone this repository:
+1. 克隆仓库; Clone this repository: `git clone https://github.com/SpereShelde/BoxHelper_QB.git && cd BoxHelper`
 
-`git clone -b pro https://github.com/SpereShelde/BoxHelper.git && cd BoxHelper`
+1. 安装环境，仅使用一次，如果已安装JDK8可跳过这一步；Build environment for the first time, which can be skipped if already installed JDK8: `bash java.sh`
 
-安装环境，仅使用一次; Build environment for the first time: `bash java.sh`
+1. 编辑配置; Edit configure file ([帮助Help](https://github.com/SpereShelde/BoxHelper_QB/wiki)): `vi config.json`
 
-编辑配置; Edit confiure file：`vi config.json`
+1. 添加Cookie文件; Import cookie file : 在cookies目录下，使用json格式保存您的站点cookie，命名为`站点域名`.json, 可以添加多个Cookie文件; Create files under 'cookies' directory, naming 'WEBSITE-DOMAIN'.json to save cookies. You can add several cookie files. ([帮助Help](https://github.com/SpereShelde/BoxHelper_QB/wiki))
 
-添加Cookie文件; Import cookie file：
+1. 开启后台; Create a background bash：`screen -R BoxHelper`
 
-在cookies目录下，使用json格式保存您的站点cookie，命名为`站点域名`.json
+1. 运行BoxHelper; Run BoxHelper：`java -jar BoxHelper.jar`
 
-Create a file under 'cookies', names 'WEBSITE-DOMAIN'.json, to save cookie.
-
-可以添加多个Cookie文件, You can add several cookie files. 
-
-开启后台; Create a background bash：`screen -R BoxHelper`
-
-运行BoxHelper; Run BoxHelper：`java -jar BoxHelper.jar`
-
-Ctrl + a + d 退出screen后台; Type Ctrl + a + d to exit;
+1. Ctrl + a + d 退出screen后台; Type Ctrl + a + d to exit;
 
 ---
 
