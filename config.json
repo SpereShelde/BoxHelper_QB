@@ -1,0 +1,13 @@
+{
+    "webUI":"http://YOURURL",
+    "sessionID":"YOURSCOOKIEVALUE",
+    "diskLimit":1024,
+    "actionAfterLimit":["2", "slow"],
+    "runningCycleInSec":20,
+    "url&speedLimit":[
+	["https://tp.m-team.cc/movie.php", "20", "-1", "36", "12"],
+	["https://open.cd/torrents.php?boardid=1", "-1", "-1", "-1", "-1"]
+    ],
+    "email":"",
+    "sendgridKey":""
+}
