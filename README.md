@@ -2,7 +2,7 @@
 ## 此版本只支持qBittorrent客户端; This version only supports qBittorrent
 ## 使用; How to use
 
-1. 克隆仓库; Clone this repository: `git clone https://github.com/SpereShelde/BoxHelper_QB.git && cd BoxHelper`
+1. 克隆仓库; Clone this repository: `git clone https://github.com/SpereShelde/BoxHelper_QB.git && cd BoxHelper_QB`
 
 1. 安装环境，仅使用一次，如果已安装JDK8可跳过这一步；Build environment for the first time, which can be skipped if already installed JDK8: `bash java.sh`
 
