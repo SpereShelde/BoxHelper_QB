@@ -39,18 +39,24 @@ public class NexusPHP implements Runnable {
 
     private void getPasskey() {
         String source;
-        driver.get(url);
-        source = driver.getPageSource();
-        Pattern passkeylink = Pattern.compile("href=.*details.php\\?id=[0-9]*.*hit=1");
-        Matcher sizeMatcher = passkeylink.matcher(source);
-        if  (sizeMatcher.find()){
-            driver.get("https://" + this.domain + "/" + sizeMatcher.group().substring(6));
-        }
-        if (driver.getPageSource().contains("passkey=")){
-            source = driver.getPageSource();
-            passkey = source.substring(source.indexOf("passkey=") + 8, source.indexOf("passkey=") + 40);
+        Pattern passkeylink;
+        if (url.contains("totheglory.im")){
+            driver.get("https://totheglory.im/my.php");
+            passkey = driver.findElementByCssSelector("#main_table > tbody > tr:nth-child(1) > td > table > tbody > tr:nth-child(2) > td > form > table > tbody > tr:nth-child(7) > td:nth-child(2)").getText();
         } else {
-            System.out.println("Cannot acquire passkey");
+            driver.get(url);
+            source = driver.getPageSource();
+            passkeylink = Pattern.compile("href=.*details.php\\?id=[0-9]*.*hit=1");
+            Matcher sizeMatcher = passkeylink.matcher(source);
+            if (sizeMatcher.find()) {
+                driver.get("https://" + this.domain + "/" + sizeMatcher.group().substring(6));
+            }
+            if (driver.getPageSource().contains("passkey=")) {
+                source = driver.getPageSource();
+                passkey = source.substring(source.indexOf("passkey=") + 8, source.indexOf("passkey=") + 40);
+            } else {
+                System.out.println("Cannot acquire passkey");
+            }
         }
     }
 
@@ -59,70 +65,134 @@ public class NexusPHP implements Runnable {
         ArrayList<String> urls = new ArrayList<>();
         String originalString = null;
         WebDriverWait webDriverWait = new WebDriverWait(driver, 10);
-        driver.get(url);
-        String s = driver.getPageSource();
+        if (url.contains("totheglory.im")){
+            driver.get(url);
+            String s = driver.getPageSource();
+            System.out.println("Searching torrent links from " + driver.getCurrentUrl() + "...");
+            webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("torrent_table")));
+            originalString = driver.findElementById("torrent_table").getAttribute("outerHTML");
 
-        System.out.println("Searching torrent links from " + driver.getCurrentUrl() + "...");
-        try {
-            webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("torrents")));
-            originalString = driver.findElementByClassName("torrents").getAttribute("outerHTML");
-        } catch (Exception e) {
-            webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("torrent_list")));
-            originalString = driver.findElementByClassName("torrent_list").getAttribute("outerHTML");
+            String searchString = originalString;
+            Pattern datePattern = Pattern.compile("[fF]ree*.*torrent=\"[0-9]*");
+            Matcher dateMatcher = datePattern.matcher(searchString);
+            int beEndIndex = 0;
+
+            double size = 0;
+            if (this.max == -1 || this.max == 0) this.max = 65535;
+            String id = "";
+            String subString = "";
+            while(dateMatcher.find()) {
+                subString = dateMatcher.group();
+                Pattern idPattern = Pattern.compile("torrent=\"[0-9]*");
+                Matcher idMatcher = idPattern.matcher(subString);
+                if  (idMatcher.find()){
+                    id  = idMatcher.group().substring(9);
+                    if ("".equals(id)){
+                        System.out.println("Cannot find torrent id.");
+                        System.exit(106);
+                    }
+                }
+
+                Pattern sizeAndUnitPattern = Pattern.compile("align=\"center\">.*<br>[TGM]B");
+                String s1 = searchString.substring(searchString.indexOf(id));
+                Matcher sizeAndUnitMatcher = sizeAndUnitPattern.matcher(s1);
+                if  (sizeAndUnitMatcher.find()){
+                    String sizeAndUnitString = sizeAndUnitMatcher.group();
+                    Pattern sizePattern = Pattern.compile("[1-9]\\d*\\.\\d*|0\\.\\d*[1-9]\\d*|[1-9]\\d*");
+                    Matcher sizeMatcher = sizePattern.matcher(sizeAndUnitString);
+                    if  (sizeMatcher.find()) {
+                        size = Double.valueOf(sizeMatcher.group());
+                    }
+                    if ("MB".equals(sizeAndUnitString.substring(sizeAndUnitString.length() - 2))){
+                        size /= 1024;
+                    }
+                    if ("TB".equals(sizeAndUnitString.substring(sizeAndUnitString.length() - 2))){
+                        size *= 1024;
+                    }
+                }
+                if (!this.urls.contains("https://totheglory.im/dl/" + id + "/" + this.passkey)) {
+                    if (size >= this.min && size <= this.max) {
+                        System.out.println("Get torrent from " + domain + ", id: " + id + ", size: " + new DecimalFormat("#0.00").format(size)  + " GB");
+                        this.urls.add("https://totheglory.im/dl/" + id + "/" + this.passkey);
+                        this.newUrls.add("https://totheglory.im/dl/" + id + "/" + this.passkey);
+                    }
+                } else {
+                    System.out.println("Already added this torrent, id: " + id + "... Skip");
+                }
+                int subIndex = searchString.indexOf(subString);
+                int subLength = subString.length();
+                beEndIndex = subIndex + subLength + beEndIndex;
+                searchString = originalString.substring(beEndIndex);
+                dateMatcher = datePattern.matcher(searchString);
+            }
+        } else {
+            driver.get(url);
+            String s = driver.getPageSource();
+            System.out.println("Searching torrent links from " + driver.getCurrentUrl() + "...");
+            try {
+                webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("torrents")));
+                originalString = driver.findElementByClassName("torrents").getAttribute("outerHTML");
+            } catch (Exception e) {
+                webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("torrent_list")));
+                originalString = driver.findElementByClassName("torrent_list").getAttribute("outerHTML");
+            }// originalString means the string of torrents list
+            String searchString = originalString;
+            Pattern datePattern = Pattern.compile("id=[0-9]*.*[fF]ree");//search the string of free torrents
+            Matcher dateMatcher = datePattern.matcher(searchString);
+            int beEndIndex = 0;
+
+            double size = 0;//record the size of torrent
+            if (this.max == -1 || this.max == 0) this.max = 65535;
+            String id = "";
+            String subString = "";
+            while(dateMatcher.find()) {
+
+                subString = dateMatcher.group();
+
+                Pattern idPattern = Pattern.compile("id=[0-9]*");
+                Matcher idMatcher = idPattern.matcher(subString);
+                if  (idMatcher.find()){
+                    id  = idMatcher.group().substring(3);
+                    if ("".equals(id)){
+                        System.out.println("Cannot find torrent id.");
+                        System.exit(106);
+                    }
+                }
+
+                Pattern sizeAndUnitPattern = Pattern.compile("id=" + id + ".*[TGM][B]");
+                Matcher sizeAndUnitMatcher = sizeAndUnitPattern.matcher(searchString.substring(searchString.indexOf(id)));
+                if  (sizeAndUnitMatcher.find()){
+                    String sizeAndUnitString = sizeAndUnitMatcher.group().substring(sizeAndUnitMatcher.group().lastIndexOf("class"));
+                    Pattern sizePattern = Pattern.compile("[1-9]\\d*\\.\\d*|0\\.\\d*[1-9]\\d*|[1-9]\\d*");
+                    Matcher sizeMatcher = sizePattern.matcher(sizeAndUnitString);
+                    if  (sizeMatcher.find()) {
+                        size = Double.valueOf(sizeMatcher.group());
+                    }
+                    if ("MB".equals(sizeAndUnitString.substring(sizeAndUnitString.length() - 2))){
+                        size /= 1024;
+                    }
+                    if ("TB".equals(sizeAndUnitString.substring(sizeAndUnitString.length() - 2))){
+                        size *= 1024;
+                    }
+                }
+                if (!this.urls.contains("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey)) {
+                    if (size >= this.min && size <= this.max) {
+                        System.out.println("Get torrent from " + domain + ", id: " + id + ", size: " + new DecimalFormat("#0.00").format(size)  + " GB");
+                        this.urls.add("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey);
+                        this.newUrls.add("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey);
+                    }
+                } else {
+                    System.out.println("Already added this torrent, id: " + id + "... Skip");
+                }
+                int subIndex = searchString.indexOf(subString);
+                int subLength = subString.length();
+                beEndIndex = subIndex + subLength + beEndIndex;
+                searchString = originalString.substring(beEndIndex);
+                dateMatcher = datePattern.matcher(searchString);
+            }
         }
 
-        String searchString = originalString;
-        String regexString = "id=[0-9]*.*[fF]ree";
-        Pattern datePattern = Pattern.compile(regexString);
-        Matcher dateMatcher = datePattern.matcher(searchString);
-        int beEndIndex = 0;
 
-        double size = 0;
-        if (this.max == -1 || this.max == 0) this.max = 65535;
-        String id = "";
-        String subString = "";
-        while(dateMatcher.find()) {
-
-            subString = dateMatcher.group();
-
-            Pattern idPattern = Pattern.compile("id=[0-9]*");
-            Matcher idMatcher = idPattern.matcher(subString);
-            if  (idMatcher.find()){
-                id  = idMatcher.group().substring(3);
-                if ("".equals(id)){
-                    System.out.println("Cannot find torrent id.");
-                    System.exit(106);
-                }
-            }
-
-            Pattern sizeAndUnitPattern = Pattern.compile("id=" + id + ".*[GM][B]");
-            Matcher sizeAndUnitMatcher = sizeAndUnitPattern.matcher(searchString.substring(searchString.indexOf(id)));
-            if  (sizeAndUnitMatcher.find()){
-                String sizeAndUnitString = sizeAndUnitMatcher.group().substring(sizeAndUnitMatcher.group().lastIndexOf("class"));
-                Pattern sizePattern = Pattern.compile("[1-9]\\d*\\.\\d*|0\\.\\d*[1-9]\\d*|[1-9]\\d*");
-                Matcher sizeMatcher = sizePattern.matcher(sizeAndUnitString);
-                if  (sizeMatcher.find()) {
-                    size = Double.valueOf(sizeMatcher.group());
-                }
-                if ("MB".equals(sizeAndUnitString.substring(sizeAndUnitString.length() - 2))){
-                    size /= 1024;
-                }
-            }
-            if (!this.urls.contains("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey)) {
-                if (size >= this.min && size <= this.max) {
-                    System.out.println("Get torrent from " + domain + ", id: " + id + ", size: " + new DecimalFormat("#0.00").format(size)  + " GB");
-                    this.urls.add("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey);
-                    this.newUrls.add("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey);
-                }
-            } else {
-                System.out.println("Already added this torrent, id: " + id + "... Skip");
-            }
-            int subIndex = searchString.indexOf(subString);
-            int subLength = subString.length();
-            beEndIndex = subIndex + subLength + beEndIndex;
-            searchString = originalString.substring(beEndIndex);
-            dateMatcher = datePattern.matcher(searchString);
-        }
     }
 
     @Override

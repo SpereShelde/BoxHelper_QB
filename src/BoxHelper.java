@@ -61,7 +61,7 @@ public class BoxHelper {
         urls.forEach(url -> {
             HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_45, false);
             String domain = url.substring(url.indexOf("//") + 2, url.indexOf("/", url.indexOf("//") + 2));
-            driver.get("http://" + domain);
+            driver.get("https://" + domain);
             ArrayList<Cookie> cookiesT = (ArrayList) cookies.get(domain);
             cookiesT.forEach(cookie -> driver.manage().addCookie(cookie));
             drivers.put(url, driver);
