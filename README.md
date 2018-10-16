@@ -12,7 +12,7 @@
 
 1. 开启后台; Create a background bash：`screen -R BoxHelper`
 
-1. 运行BoxHelper; Run BoxHelper：`java -jar BoxHelper.jar`
+1. 运行BoxHelper; Run BoxHelper：`java -jar BoxHelper_QB.jar`
 
 1. Ctrl + a + d 退出screen后台; Type Ctrl + a + d to exit;
 
