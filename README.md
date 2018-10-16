@@ -8,13 +8,7 @@
 
 ---
 
-## 目前完成度; Status
-
-- Support NexusPHP & TTG
-
-- ONLY Support qBittorrent.
-
-## 注意事项; Watch this！ 
+## Watch this！ 
 
 - BoxHelper 需要你提供Cookie，并会获取你的passkey，但是 BoxHelper 不会上传他们
 
@@ -27,3 +21,19 @@
 - 如有任何问题，请发Issue或联系我: `spereshelde#gmail.com`
 
 - Please open an issue or mail me at `spereshelde#gmail.com` if you have any questions.
+
+---
+
+## Status
+
+- Support NexusPHP & TTG
+
+- ONLY Support qBittorrent.
+
+---
+
+## To Do List
+
+- Super mode: Optimize the speed of seeding.
+
+- Reduce the complexity of authorization of PT sites.
