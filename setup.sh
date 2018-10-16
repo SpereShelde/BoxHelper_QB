@@ -305,7 +305,7 @@ uninstall_boxhelper(){
 
 start_boxhelper(){
     echo "正在从后台启动 BoxHelper, 日志文件为 bh.log ..."
-    nohup java -jar BoxHelper_QB.jar > bh.log 2>&1 &
+    nohup java -jar BoxHelper_QB/BoxHelper_QB.jar > bh.log 2>&1 &
 }
 
 stop_boxhelper(){
