@@ -36,14 +36,18 @@ public class ConvertJson {
         if (webUI.endsWith("/")) webUI = webUI.substring(0, webUI.length() - 1);
         configures.put("webUI", webUI);
         configures.put("sessionID", object.get("sessionID").getAsString());
-        configures.put("diskLimit", object.get("diskLimit").getAsInt());
+        if ("-1".equals(object.get("diskLimit"))){
+            configures.put("diskLimit", "1024000");
+        } else {
+            configures.put("diskLimit", object.get("diskLimit").getAsInt());
+        }
         JsonArray arrayAction = object.get("actionAfterLimit").getAsJsonArray();
         for (JsonElement a: arrayAction) {
             if (a != null || !"".equals(a.getAsString())) action.add(a.getAsString());
         }
         configures.put("action", action.toArray());
         configures.put("runningCycleInSec", object.get("runningCycleInSec").getAsInt());
-        JsonArray arrayURL = object.get("url&speedLimit").getAsJsonArray();
+        JsonArray arrayURL = object.get("urls").getAsJsonArray();
         ArrayList<String> urls = new ArrayList<>();
         for (JsonElement a: arrayURL) {
             JsonArray url = a.getAsJsonArray();
@@ -61,12 +65,8 @@ public class ConvertJson {
             }
         }
         configures.put("urls", urls);
-        if (object.has("email")) {
-            configures.put("email", object.get("email").getAsString());
-        }
-        if (object.has("sendgridKey")) {
-            configures.put("sendgridKey", object.get("sendgridKey").getAsString());
-        }
+        boolean load = object.get("load").getAsBoolean();
+        configures.put("load", load);
         return configures;
     }
 

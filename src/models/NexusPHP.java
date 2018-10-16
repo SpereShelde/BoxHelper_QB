@@ -23,6 +23,7 @@ public class NexusPHP implements Runnable {
     private HtmlUnitDriver driver;
     private Map<String, String> qbConfig;
     private QBittorrent qBittorrent;
+    private boolean load;
 
     public NexusPHP(String url, double min, double max, double down, double up, HtmlUnitDriver driver, Map qbConfig) {
         this.url = url;
@@ -34,6 +35,8 @@ public class NexusPHP implements Runnable {
         this.driver = driver;
         this.qbConfig = qbConfig;
         this.getPasskey();
+        boolean load = false;
+        if ("true".equals(this.qbConfig.get("load"))) this.load = true;
         qBittorrent = new QBittorrent(this.qbConfig.get("webUI"), this.qbConfig.get("sessionID"), url, this.urls, this.down, this.up);
     }
 
@@ -110,6 +113,7 @@ public class NexusPHP implements Runnable {
                         size *= 1024;
                     }
                 }
+                if (this.urls.size() == 0 && !this.load) this.urls.add("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey);
                 if (!this.urls.contains("https://totheglory.im/dl/" + id + "/" + this.passkey)) {
                     if (size >= this.min && size <= this.max) {
                         System.out.println("Get torrent from " + domain + ", id: " + id + ", size: " + new DecimalFormat("#0.00").format(size)  + " GB");
@@ -175,6 +179,7 @@ public class NexusPHP implements Runnable {
                         size *= 1024;
                     }
                 }
+                if (this.urls.size() == 0 && !this.load) this.urls.add("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey);
                 if (!this.urls.contains("https://" + domain + "/download.php?id=" + id + "&passkey=" + this.passkey)) {
                     if (size >= this.min && size <= this.max) {
                         System.out.println("Get torrent from " + domain + ", id: " + id + ", size: " + new DecimalFormat("#0.00").format(size)  + " GB");

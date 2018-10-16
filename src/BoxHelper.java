@@ -86,6 +86,7 @@ public class BoxHelper {
             qbconfig.put("webUI", boxHelper.configures.get("webUI").toString());
             qbconfig.put("sessionID", boxHelper.configures.get("sessionID").toString());
             nexusPHPS.add(new NexusPHP(url.toString(), Double.parseDouble(urlAndLimit[0]), Double.parseDouble(urlAndLimit[1]), Double.parseDouble(urlAndLimit[2]),Double.parseDouble(urlAndLimit[3]), (HtmlUnitDriver)driver, qbconfig));
+            qbconfig.put("load", boxHelper.configures.get("load").toString());
         });
 
         while (true){
