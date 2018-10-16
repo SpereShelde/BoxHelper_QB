@@ -8,6 +8,20 @@
 
 ---
 
+## Features
+
+无人值守自动刷站：
+
+- 自动监听PT站点，下载Free种或2xFree种
+
+- 按照体积筛选种子
+
+- 不同站点不同单种限速
+
+- 空间使用超上限后自动删种
+
+---
+
 ## Watch this！ 
 
 - BoxHelper 需要你提供Cookie，并会获取你的passkey，但是 BoxHelper 不会上传他们
