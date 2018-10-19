@@ -1,3 +1,5 @@
+# 本仓库可以使用但已经废弃，所有功能已并入 [BoxHelper](https://github.com/SpereShelde/BoxHelper)
+------
 # BoxHelper
 ## 此版本只支持qBittorrent客户端; This version only supports qBittorrent
 ## Usage
